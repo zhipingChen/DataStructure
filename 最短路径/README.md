@@ -29,6 +29,8 @@ def releax(edge, distance, parent):
     elif distance[edge.end - 1] == None or distance[edge.end - 1] > distance[edge.begin - 1] + edge.weight:
         distance[edge.end - 1] = distance[edge.begin - 1] + edge.weight
         parent[edge.end - 1] = edge.begin - 1
+        return True
+    return False
 ```
 
 ```distance``` 列表存储从起点到当前顶点的路径权值，```parent``` 列表存储到当前顶点的前驱顶点下标值。初始 ```distance``` 列表和```parent``` 列表元素皆为 ```None```，表示路径权值为无穷大，处于不可达状态。
@@ -181,15 +183,35 @@ def bellman_ford(graph, start, end):
             releax(edges[i], distance, parent)
         times += 1
     for i in range(len(edges)):
-        if distance[edges[i].end - 1] > distance[edges[i].begin - 1] + edges[i].weight:
+        if releax(edges[i], distance, parent):
             return False
     return True
 ```
 
 代码中 ```distance``` 和 ```parent``` 两个列表的作用在上面已经提过了，```times``` 变量用于记录迭代的执行次数，```edges``` 列表是存储边的集合，```getEdgesFromAdjacencyList``` 函数用于从邻接矩阵中转换出边的集合。代码中第一个循环内包含一个嵌套循环，用于对边集执行 $|V|-1$ 次迭代松弛，第二个循环用于执行第 $|V|$ 次迭代，判断是否发生更新最短路径权值的情况，若发生更新权值，则表示图中存在负权回路。
 
-> 根据之前的结论可知，若图中仍存在未确认顶点，则执行一次迭代松弛后，必然存在新增加的已确认顶点。代码示例中设定松弛的迭代次数为 $|V|-1$ 次，是为了确保最坏情况下，```Bellman-Ford ``` 算法结束后也能够获得起点到各个顶点的最短路径。但是在最优情况下，对边集进行一次松弛后，即得到了最终的结果。所以可以通过判断一次迭代后是否有新增加的已确认顶点，或者更准确的说，判断一次迭代过程中，是否通过某条边的松弛减小了起点到某个顶点的路径权值，以此来判断是否已经到达最终状态，从而减少嵌套循环的执行次数。
+> 根据之前的结论可知，若图中仍存在未确认顶点，则执行一次迭代松弛后，必然存在新增加的已确认顶点。代码示例中设定松弛的迭代次数为 $|V|-1$ 次，是为了确保最坏情况下，```Bellman-Ford ``` 算法结束后也能够获得起点到各个顶点的最短路径。但是在最优情况下，对边集进行一次松弛后，即得到了最终的结果。所以可以通过判断一次迭代后是否有新增加的已确认顶点，或者更准确的说，判断一次迭代过程中，是否通过某条边的松弛，减小了从起点到某个顶点的路径权值，以此来判断是否已经到达最终状态，从而减少嵌套循环的执行次数。
 
+**优化算法示例**
+
+```
+def bellman_ford(graph, start, end):
+    distance, parent = [None for i in range(graph.number)], [None for i in range(graph.number)]
+    times, distance[start - 1], edges = 1, 0, getEdgesFromAdjacencyList(graph)
+    flag = True
+    while flag and times < graph.number:
+        flag = False
+        for i in range(len(edges)):
+            if releax(edges[i], distance, parent) and not flag:
+                flag = True
+        times += 1
+    for i in range(len(edges)):
+        if releax(edges[i], distance, parent):
+            return False
+    return True
+```
+
+代码中增加 ```flag``` 变量标志是否已经找到从起点到各个顶点的最短路径，若已找到，则停止迭代松弛，最好情况下只需要一次迭代即可完成，时间复杂度为 $O(|E|)$。
 ##### 性能分析
 
 ```Bellman-Ford``` 算法中共存在 $|V|$ 次对边集合的迭代松弛，边集合的大小为 $|E|$，所以```Bellman-Ford``` 算法的时间复杂度为 $O(|V||E|)$。

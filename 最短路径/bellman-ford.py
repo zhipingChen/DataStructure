@@ -20,18 +20,23 @@ def releax(edge, distance, parent):
     elif distance[edge.end - 1] == None or distance[edge.end - 1] > distance[edge.begin - 1] + edge.weight:
         distance[edge.end - 1] = distance[edge.begin - 1] + edge.weight
         parent[edge.end - 1] = edge.begin - 1
+        return True
+    return False
 
 
 # representing shortest path
 def bellman_ford(graph, start, end):
     distance, parent = [None for i in range(graph.number)], [None for i in range(graph.number)]
     times, distance[start - 1], edges = 1, 0, getEdgesFromAdjacencyList(graph)
-    while times < graph.number:
+    flag = True
+    while flag and times < graph.number:
+        flag = False
         for i in range(len(edges)):
-            releax(edges[i], distance, parent)
+            if releax(edges[i], distance, parent) and not flag:
+                flag = True
         times += 1
     for i in range(len(edges)):
-        if distance[edges[i].end - 1] > distance[edges[i].begin - 1] + edges[i].weight:
+        if releax(edges[i], distance, parent):
             return False
     return True
 
