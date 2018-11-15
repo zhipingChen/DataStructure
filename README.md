@@ -20,4 +20,6 @@
 
 #### [最小生成树](./最小生成树/README.md)
 
-#### [最短路径](./最短路径/README.md)
+#### [最短路径(Bellman-Ford)](./最短路径(Bellman-Ford)/README.md)
+
+#### [最短路径(Dijkstra)](./最短路径(Dijkstra)/README.md)
