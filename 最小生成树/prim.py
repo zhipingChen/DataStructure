@@ -10,7 +10,7 @@ def updateVertices(graph, vertices, verticesIndex, index):
             node = node.next
             continue
         vertex = vertices[verticesIndex[node.index - 1]]
-        if not vertex['weight'] or (vertex['weight'] and vertex['weight'] > node.weight):
+        if not vertex['weight'] or vertex['weight'] > node.weight:
             vertex['weight'] = node.weight
             pos = verticesIndex[vertex['index']]
             while pos > 0 and (not vertices[(pos - 1) // 2]['weight'] or vertices[pos]['weight'] < vertices[(pos - 1) // 2]['weight']):

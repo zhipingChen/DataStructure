@@ -191,7 +191,7 @@ def prim(graph, index):
 
 > 因为对 ```vertices``` 列表排序后，每个顶点元素在 ```vertices```  列表的下标值不能表示该顶点的编号，而后续添加新顶点后，在更新相邻顶点距离的操作中，为了避免查找相邻顶点而遍历整个列表，需要根据顶点编号进行直接访问相邻顶点，所以借助 ```verticesIndex``` 列表存储每个顶点元素在 ```vertices``` 列表中的位置。例如要更新顶点 $v$ 的距离，则 ```verticesIndex[v]``` 值为顶点 $v$ 在 ```vertices``` 列表中的位置，$v$ 顶点元素即为 ```vertices[verticesIndex[v]]```。
 
-2. 交换堆顶元素
+2. 交换列表首尾元素
 
 ```
 def swapVertices(vertices, verticesIndex, origin, target):
@@ -211,7 +211,7 @@ def updateVertices(graph, vertices, verticesIndex, index):
             node = node.next
             continue
         vertex = vertices[verticesIndex[node.index - 1]]
-        if not vertex['weight'] or (vertex['weight'] and vertex['weight'] > node.weight):
+        if not vertex['weight'] or vertex['weight'] > node.weight:
             vertex['weight'] = node.weight
             pos = verticesIndex[vertex['index']]
             while pos > 0 and (not vertices[(pos - 1) // 2]['weight'] or vertices[pos]['weight'] < vertices[(pos - 1) // 2]['weight']):
@@ -219,11 +219,11 @@ def updateVertices(graph, vertices, verticesIndex, index):
                 pos = (pos - 1) // 2
         node = node.next
 ```
-对每一个相邻顶点，如果不在子图中，则判断是否更新到子图的距离。
+对每一个相邻顶点，如果不在子图中，则判断是否更新到子图的距离。更新距离后的 ```while``` 循环操作，目的为调整堆结构为小顶堆。
 
 ##### 性能分析
 
-```prim``` 算法中构造顶点列表的时间复杂度为 $O(|V|)$。使用堆排序对顶点列表进行排序，时间复杂度为 $O(|V|log |V|)$。```prim``` 算法中 ```while``` 循环取最近顶点元素，并调整元素取出后列表的堆结构，所以总体的调整复杂度为 $O(|V|log |V|)$；同时循环结构内执行 ```updateVertices``` 函数，更新每个取出顶点的相邻顶点距离值，所以总体的更新顶点数为 $O(|E|)$，因为每个顶点更新距离后，需要调整堆结构为小顶堆，所以总体的复杂度为 $O(|E|log |V|)$。所以```prim``` 算法的时间复杂度为 $O(|E|log |V|)$。
+```prim``` 算法中构造顶点列表的时间复杂度为 $O(|V|)$。使用堆排序对顶点列表进行排序，时间复杂度为 $O(|V|log |V|)$。```prim``` 算法中 ```while``` 循环取最近顶点元素，并调整元素取出后列表的堆结构，所以调整复杂度为 $O(|V|log |V|)$；同时，循环结构内执行 ```updateVertices``` 函数，更新每个取出顶点的相邻顶点距离值，所以更新顶点数为 $O(|E|)$，因为每个顶点更新距离后，需要调整堆结构为小顶堆，所以更新复杂度为 $O(|E|log |V|)$。所以```prim``` 算法的总时间复杂度为 $O(|E|log |V|)$。
 
 ### 代码附录
 
